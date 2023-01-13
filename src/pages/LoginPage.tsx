@@ -1,12 +1,30 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Row, Card, Space, Typography, Image } from 'antd';
 import Login, { LoginDataType } from "../component/Login";
 
+import { useAppDispatch, useAppSelector } from "../store/hook/useTypedSelector";
+import { login as userLogin } from '../store/slices/authSlice';
+import { updateUser } from "../store/slices/userSlice";
+
 const { Title } = Typography;
 
-const LoginPage: React.FC<any> = () => {
-  const handleLogin = (data: LoginDataType) => {
-    console.log('login', data)
+const LoginPage: React.FC = () => {
+  const navigate = useNavigate();
+
+  const dispatch = useAppDispatch();
+  const auth = useAppSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (auth.isAuthenticate && auth.data) {
+      dispatch(updateUser(auth.data));
+      navigate("/");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auth.isAuthenticate])
+
+  const handleLogin = async (data: LoginDataType) => {
+    dispatch(userLogin(data));
   }
 
   return (
@@ -25,7 +43,11 @@ const LoginPage: React.FC<any> = () => {
         />
         <Card style={{ width: 400 }}>
           <Title>Login</Title>
-          <Login onLogin={handleLogin} />
+          <Login
+            loading={auth.loading}
+            valid={auth.isAuthenticate !== null ? auth.isAuthenticate : true}
+            onLogin={handleLogin}
+          />
         </Card>
       </Space>
     </Row>

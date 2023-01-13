@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Button, Form, Input } from 'antd';
+import { Alert, Button, Form, Input } from 'antd';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 
 export interface LoginDataType {
@@ -11,10 +11,10 @@ export interface LoginDataType {
 interface LoginProps {
   onLogin(data: LoginDataType): void,
   loading?: boolean,
+  valid?: boolean,
 }
 
 const Login: React.FC<LoginProps> = (props) => {
-
   const handelFinishLogin = (data: LoginDataType) => {
     props.onLogin(data);
   }
@@ -26,6 +26,11 @@ const Login: React.FC<LoginProps> = (props) => {
       onFinish={handelFinishLogin}
       disabled={props.loading}
     >
+      {!props.valid && (
+        <Form.Item>
+          <Alert message="Invalid username or password" type="error" showIcon />
+        </Form.Item>)
+      }
       <Form.Item
         name="username"
         rules={[{ required: true, message: 'Please input your Username' }]}
