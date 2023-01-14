@@ -15,19 +15,25 @@ const axiosRequester = async (
   const config = {
     method,
     url: API_URL + path,
+    headers: {
+      'x-access-token': loadLocalStorage('token'),
+    },
     ...rest
   };
   try {
     const result: AxiosResponse = await axios(config);
     return result;
   } catch (error: any) {
+    if (error.response.status === 401) {
+      localStorage.removeItem('token');
+    }
     throw error
   }
 }
 
 const loginAPI = async (data: LoginDataType) => {
   try {
-    const response = await axiosRequester({ method: 'post', path: '/login', data })
+    const response: AxiosResponse = await axiosRequester({ method: 'post', path: '/login', data })
     if (response.data.token) {
       localStorage.setItem("token", JSON.stringify(response.data.token))
     }
@@ -39,13 +45,44 @@ const loginAPI = async (data: LoginDataType) => {
 
 const getProfileAPI = async () => {
   try {
+    const config = { method: 'get', path: '/profile' }
+    const response: AxiosResponse = await axiosRequester(config);
+    return response;
+  } catch (error: any) {
+    throw error;
+  }
+}
+
+const getAllPostsAPI = async (limit?: number, page?: number) => {
+  try {
     const config = {
-      method: 'get', path: '/profile',
-      headers: {
-        'x-access-token': loadLocalStorage('token'),
-      }
+      method: 'get', path: '/posts',
+      params: { limit, page }
     }
-    const response = await axiosRequester(config)
+    const response: AxiosResponse = await axiosRequester(config);
+    return response;
+  } catch (error: any) {
+    throw error;
+  }
+}
+
+const getPostByIdAPI = async (id: string) => {
+  try {
+    const config = { method: 'get', path: `/posts/${id}` }
+    const response: AxiosResponse = await axiosRequester(config);
+    return response;
+  } catch (error: any) {
+    throw error;
+  }
+}
+
+const getPostsByTagsAPI = async (tags: string, limit?: number, page?: number) => {
+  try {
+    const config = {
+      method: 'get', path: '/search/tags',
+      params: { tags, limit, page }
+    }
+    const response: AxiosResponse = await axiosRequester(config);
     return response;
   } catch (error: any) {
     throw error;
@@ -54,5 +91,8 @@ const getProfileAPI = async () => {
 
 export {
   loginAPI,
-  getProfileAPI
+  getProfileAPI,
+  getAllPostsAPI,
+  getPostByIdAPI,
+  getPostsByTagsAPI,
 }

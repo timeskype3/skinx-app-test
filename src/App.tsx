@@ -1,8 +1,8 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoutes from './component/ProtectedRoutes';
+import UnprotectedRoutes from './component/UnprotectedRoutes';
 import Dashboard from './pages/Dashboard';
 import LoginPage from './pages/LoginPage';
-import './App.css';
 
 function App() {
   return (
@@ -10,7 +10,9 @@ function App() {
       <Route element={<ProtectedRoutes />}>
         <Route index element={<Dashboard />} />
       </Route>
-      <Route path='/login' element={<LoginPage />} />
+      <Route element={<UnprotectedRoutes />}>
+        <Route path='/login' element={<LoginPage />} />
+      </Route>
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
   );

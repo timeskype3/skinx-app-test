@@ -11,5 +11,5 @@ const loadLocalStorage = (key: string) => {
 }
 
 export {
-  loadLocalStorage
+  loadLocalStorage,
 }
