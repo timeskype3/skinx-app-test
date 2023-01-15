@@ -10,6 +10,7 @@ import InfiniteScroll from "react-infinite-scroller";
 
 interface PostsContainerProps {
   postsData: any,
+  isError: boolean,
   onPostCardClick(post: IPost): void,
   onPostsLoadMore(page: number): void,
 }
@@ -18,6 +19,7 @@ const PostsContainer: React.FC<PostsContainerProps> = ({
   postsData,
   onPostCardClick,
   onPostsLoadMore,
+  isError,
 }) => {
   return (
     <Col style={{
@@ -41,7 +43,7 @@ const PostsContainer: React.FC<PostsContainerProps> = ({
       ) : (
         postsData.data && postsData.data.pages[0].results.length !== 0 ?
           <InfiniteScroll
-            hasMore={postsData.hasNextPage}
+            hasMore={!isError && postsData.hasNextPage}
             loadMore={onPostsLoadMore}
             loader={
               <Space direction="vertical" align='center' style={{ width: '100%', margin: '1rem' }}>

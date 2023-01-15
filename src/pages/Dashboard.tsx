@@ -29,6 +29,7 @@ const Dashboard: React.FC = () => {
   const [isPostModalLoading, setIsPostModalLoading] = useState<boolean>(false);
   const [isPostsTagsLoading, setIsPostsTagsLoading] = useState<boolean>(false);
   const [postsTags, setPostsTags] = useState<IPost[] | []>([]);
+  const [isAllPostsError, setIsAllPostsError] = useState<boolean>(false);
 
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
@@ -47,10 +48,15 @@ const Dashboard: React.FC = () => {
 
 
   const fetchAllPosts = async ({ pageParam = 1 }) => {
-    const resAllPost = await getAllPostsAPI(20, pageParam);
-    const results: IPost[] = resAllPost.data;
-    const hasNextPage: boolean = results.length > 0 ? true : false;
-    return { results, nextPage: pageParam + 1, hasNextPage }
+    try {
+      const resAllPost = await getAllPostsAPI(20, pageParam);
+      const results: IPost[] = resAllPost.data;
+      const hasNextPage: boolean = results.length > 0 ? true : false;
+      return { results, nextPage: pageParam + 1, hasNextPage }
+    } catch (error: unknown) {
+      setIsAllPostsError(true);
+      throw error;
+    }
   }
 
   const fetchPostsByTags = async (tags: string, limit: number, page: number) => {
@@ -95,7 +101,7 @@ const Dashboard: React.FC = () => {
     getNextPageParam: (lastPage) => {
       if (lastPage.hasNextPage) return lastPage.nextPage;
       return undefined;
-    }
+    },
   });
 
   return (
@@ -143,6 +149,7 @@ const Dashboard: React.FC = () => {
             postsData={allPostsData}
             onPostCardClick={handlePostCardClick}
             onPostsLoadMore={(page: number) => allPostsData.fetchNextPage({ pageParam: page + 1 })}
+            isError={isAllPostsError}
           />
         </Row>
         <PostModal
