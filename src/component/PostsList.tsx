@@ -48,6 +48,7 @@ const PostsList: React.FC<PostsListProps> = (props) => {
       <VirtualList
         data={data}
         height={ContainerHeight}
+        fullHeight={false}
         itemHeight={47}
         itemKey="_id"
         onScroll={onScroll}

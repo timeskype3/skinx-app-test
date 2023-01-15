@@ -60,17 +60,17 @@ const SearchTag: React.FC<SearchTagProps> = (props) => {
     return (
       <>
         {menu}
-        {props.posts.length > 0 ? (!props.isLoading ?
-          <PostsList
-            tags={tags}
-            posts={props.posts}
-            onPostsListClick={handlePostsListClick}
-          />
-          :
+        {props.isLoading ?
           <Space direction="vertical" align='center' style={{ width: '100%', margin: '1rem' }}>
             < Spin size="small" />
-          </Space>) :
-          <Empty style={{ margin: '10px 0' }} description="Post not found" />
+          </Space>
+          : props.posts.length > 0 ?
+            <PostsList
+              tags={tags}
+              posts={props.posts}
+              onPostsListClick={handlePostsListClick}
+            /> :
+            <Empty style={{ margin: '10px 0' }} description="Post not found" />
         }
       </>
     )
