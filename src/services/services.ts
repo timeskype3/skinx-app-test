@@ -1,9 +1,9 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { LoginDataType } from '../component/Login';
-import { loadLocalStorage } from '../utils';
 
 const env = process.env;
 const API_URL = env.REACT_APP_API_PATH + ":" + env.REACT_APP_API_PORT;
+axios.defaults.withCredentials = true;
 
 interface AxiosRequesterProps extends AxiosRequestConfig {
   path: string,
@@ -15,17 +15,14 @@ const axiosRequester = async (
   const config = {
     method,
     url: API_URL + path,
-    headers: {
-      'x-access-token': loadLocalStorage('token'),
-    },
     ...rest
   };
   try {
     const result: AxiosResponse = await axios(config);
     return result;
   } catch (error: any) {
-    if (error.response.status === 401) {
-      localStorage.removeItem('token');
+    if ([401, 403].includes(error.response.status)) {
+      localStorage.removeItem("auth");
     }
     throw error
   }
@@ -34,9 +31,18 @@ const axiosRequester = async (
 const loginAPI = async (data: LoginDataType) => {
   try {
     const response: AxiosResponse = await axiosRequester({ method: 'post', path: '/login', data })
-    if (response.data.token) {
-      localStorage.setItem("token", JSON.stringify(response.data.token))
+    if (response.data) {
+      localStorage.setItem("auth", JSON.stringify(true))
     }
+    return response;
+  } catch (error: any) {
+    throw error;
+  }
+}
+
+const logoutAPI = async () => {
+  try {
+    const response: AxiosResponse = await axiosRequester({ method: 'get', path: '/logout' });
     return response;
   } catch (error: any) {
     throw error;
@@ -91,6 +97,7 @@ const getPostsByTagsAPI = async (tags: string, limit?: number, page?: number) =>
 
 export {
   loginAPI,
+  logoutAPI,
   getProfileAPI,
   getAllPostsAPI,
   getPostByIdAPI,
